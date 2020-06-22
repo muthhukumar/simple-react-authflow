@@ -1,15 +1,19 @@
-import express, { NextFunction, Response, Request } from "express";
+import express from "express";
 import cors from "cors";
 import { json } from "body-parser";
 import graphqlHttp from "express-graphql";
+import helmet from "helmet"
+import cookieParser from "cookie-parser";
 
 import schema from "./graphql/Schema/index";
-import HttpError from "./models/HttpError";
 import userReducer from "./graphql/resolvers/user-resolver";
 import Auth from "./middleware/AuthMiddleware";
-import path from "path";
+import { routeNotFound, errorHandler } from "./middleware/ErrorMiddleware";
+import authRoute from "./routes/userRoute";
 
-//require("dotenv").config();
+
+
+
 require("./connection/Mongoose");
 
 const app = express();
@@ -17,41 +21,35 @@ const app = express();
 const PORT = process.env.PORT;
 
 app.use(json());
-app.use(
-   cors({
-      credentials: true,
-      origin: true
-   })
-);
 
+app.use(helmet());
+
+app.use(cookieParser());
+
+app.use(
+    cors({
+        credentials: true,
+        origin: process.env.CORS_ORIGIN
+    })
+);
 
 app.use(Auth);
-/*
-app.use(express.static(path.join("public")));
-*/
+
+app.use("/user", authRoute);
+
 app.use(
-   "/graphql",
-   graphqlHttp({
-      schema: schema,
-      rootValue: userReducer,
-      graphiql: true
-   })
+    "/graphql",
+    graphqlHttp({
+        schema: schema,
+        rootValue: userReducer,
+        graphiql: true
+    })
 );
-/*
-app.use((_, res, _1) => {
-   res.sendFile(path.resolve(__dirname, "public", "index.html"));
-});
-*/
 
-app.use((req, res, next)=>{
-   throw new Error("could not find this route");
-});
+app.use(routeNotFound);
 
-app.use((err: HttpError, _: Request, res: Response, next: NextFunction) => {
-   if (res.headersSent) return next(err);
-   res.status(err.code || 500).send(err.message || "Internal Server Error");
-});
+app.use(errorHandler);
 
 app.listen(PORT, () => {
-   console.log(`Server is listening in the port ${PORT}`);
+    console.log(`Server is listening in the port ${PORT}`);
 });

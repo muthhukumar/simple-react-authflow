@@ -2,8 +2,14 @@ import jwt from "jsonwebtoken";
 
 //require("dotenv").config();
 
-const secret = process.env.ACCESS_TOKEN_SECRET;
+const accesstoken_secret = process.env.ACCESS_TOKEN_SECRET!;
+const refreshtoken_secret = process.env.REFRESH_TOKEN_SECRET!;
 
-export default (userId: string) => {
-  return jwt.sign({ userId }, secret!, { expiresIn: "2h" });
+export const genAccesstoken = (userId: string) :string => {
+  return jwt.sign({ userId }, accesstoken_secret, { expiresIn: "6h" });
 };
+
+export const genRefreshtoken =  (userId: string) :string => {
+  return jwt.sign({ userId }, refreshtoken_secret, { expiresIn: "72h" });
+};
+
