@@ -33,8 +33,10 @@ const Profile: React.FC = () => {
           headers: {
             Authorization: "Bearer " +accesstoken,
           },
+          url : "/graphql",
           method: "post",
           data: { query },
+          withCredentials : true,
         });
         setName(response.data.data.userDetails.username);
         setEmail(response.data.data.userDetails.email);

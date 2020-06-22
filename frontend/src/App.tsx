@@ -1,4 +1,4 @@
-import React, {Suspense} from "react";
+import React, {Suspense, useEffect} from "react";
 import {
    BrowserRouter as Router,
    Switch,
@@ -13,6 +13,7 @@ import Home from "./containers/Home";
 import Layout from "./containers/Layout";
 import { useAuthContext, AuthContext } from "./shared/hooks/AuthContext-hook";
 import LoadingSpinner from "./shared/components/UIElements/LoadingSpinner";
+import axios from "./util/axios";
 
 const Login = React.lazy(() => import("./containers/Login"));
 const SignUp = React.lazy(() => import("./containers/SignUp"));
@@ -25,6 +26,20 @@ function App() {
       error,
       setErrorMessage
    ] = useAuthContext();
+
+   useEffect(()=>{
+      const autoLogin = async ()=>{
+         let response;
+         try{
+            response = await axios({url : "/user/refresh_token", method : "get"}) 
+            if(response.data.accesstoken) login(response.data.accesstoken);
+         }catch(err){
+         }
+      }
+      if(!accesstoken) autoLogin();
+   },[login, accesstoken]);
+
+
 
    let route;
    if (accesstoken) {

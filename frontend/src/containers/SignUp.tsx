@@ -35,6 +35,7 @@ const SignUp: React.FC = () => {
       try {
          serverResponse = await httpClient(
             { query, variables: { username, email, password } },
+            "/graphql",
             "post",
             null
          );

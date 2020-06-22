@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 
 import axios from "../../util/axios";
 
@@ -7,8 +7,9 @@ export const useHttpClient = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const activeHttpRequest = useRef<AbortController[]>([]);
 
-  const httpClient = async (
+  const httpClient =useCallback(async (
     data: any,
+    url : string,
     method: "post" | "get" | "patch" | "delete",
     token: string | null
   ) => {
@@ -24,7 +25,7 @@ export const useHttpClient = () => {
     }
 
     try {
-      response = await axios({ method, data, headers });
+      response = await axios({url,method, data, headers });
       activeHttpRequest.current = activeHttpRequest.current.filter(
         (ctrl) => ctrl !== abortSignal
       );
@@ -35,7 +36,8 @@ export const useHttpClient = () => {
       setIsLoading(false);
       throw new Error("Something went wrong");
     }
-  };
+  },[]);
+
   useEffect(() => {
     return () => activeHttpRequest.current.forEach((ctrl) => ctrl.abort());
   }, []);
