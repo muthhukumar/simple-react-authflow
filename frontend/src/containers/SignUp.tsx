@@ -1,4 +1,4 @@
-import React from "react";
+import React , {useRef, useEffect} from "react";
 import "./Auth.css";
 import Card from "../shared/components/UIElements/Card";
 import { useHttpClient } from "../shared/hooks/http-hook";
@@ -20,6 +20,11 @@ const SignUp: React.FC = () => {
    ] = useErrorModal();
 
    const [, resetError, isLoading, resetLoading, httpClient] = useHttpClient();
+   
+   const mounted = useRef(true);
+
+
+
 
    const onSubmitHandler = async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -40,10 +45,14 @@ const SignUp: React.FC = () => {
             null
          );
       } catch (err) {
+         if(mounted.current){
          setIsErrorModalOpen(true);
          setMessage(err.message);
+         }
          return;
       }
+
+      if(!mounted.current) return;
 
       if (!serverResponse.data.errors && serverResponse.data.data) {
          setIsErrorModalOpen(true);
@@ -62,6 +71,10 @@ const SignUp: React.FC = () => {
       resetError();
       resetLoading();
    };
+
+   useEffect(()=>{
+      return ()=> { mounted.current = false}
+   },[])
 
    return (
       <Card>

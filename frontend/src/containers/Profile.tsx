@@ -1,21 +1,24 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState} from "react";
 
 import "./Profile.css";
 import Card from "../shared/components/UIElements/Card";
 import LoadingSpinner from "../shared/components/UIElements/LoadingSpinner";
 import { AuthContext } from "../shared/hooks/AuthContext-hook";
 import axios from "../util/axios";
+import Axios from "axios";
 import BackDrop from "../shared/components/UIElements/BackDrop";
 
 const Profile: React.FC = () => {
   const isAuth = useContext(AuthContext);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [userDetails, setUserDetails] = useState({ email : "", username: ""});
+
   const [isLoading, setIsLoading] = useState(false);
   const {accesstoken} = isAuth;
 
   useEffect(() => {
+  const source = Axios.CancelToken.source();
     const fetchUserData = async () => {
+       console.log(userDetails);
       let response;
       const query = `
         query GetUserDetails{
@@ -33,23 +36,29 @@ const Profile: React.FC = () => {
           headers: {
             Authorization: "Bearer " +accesstoken,
           },
+          cancelToken : source.token,
           url : "/graphql",
           method: "post",
           data: { query },
           withCredentials : true,
         });
-        setName(response.data.data.userDetails.username);
-        setEmail(response.data.data.userDetails.email);
+        console.log(response.data.data);
+        const {email , username} = response.data.data.userDetails;
+        setUserDetails({email, username});  
+
         setIsLoading(false);
       } catch (err) {
+         if(Axios.isCancel(err)){
+         }else{
+            throw err;
+         }
         setIsLoading(false);
-        return;
       }
     };
-    if (!name || !email) fetchUserData();
-  }, [email, accesstoken, name]);
+    if (!userDetails.username || !userDetails.email) fetchUserData();
+    return ()=> source.cancel();
+  }, [userDetails, accesstoken]);
   
-
   const onBackDropClickHanlder = () => {
      setIsLoading(false);
   };
@@ -60,8 +69,8 @@ const Profile: React.FC = () => {
       {isLoading && <BackDrop onClick={onBackDropClickHanlder} />}
       <div className="profile-wrapper">
         <div className="profile-title">Profile</div>
-        <div className="profile-content">Name : {name}</div>
-        <div className="profile-content">Email : {email}</div>
+        <div className="profile-content">Name : {userDetails.username}</div>
+        <div className="profile-content">Email : {userDetails.email}</div>
       </div>
     </Card>
   );

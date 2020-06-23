@@ -14,6 +14,7 @@ import Layout from "./containers/Layout";
 import { useAuthContext, AuthContext } from "./shared/hooks/AuthContext-hook";
 import LoadingSpinner from "./shared/components/UIElements/LoadingSpinner";
 import axios from "./util/axios";
+import Axios from "axios";
 
 const Login = React.lazy(() => import("./containers/Login"));
 const SignUp = React.lazy(() => import("./containers/SignUp"));
@@ -28,15 +29,18 @@ function App() {
    ] = useAuthContext();
 
    useEffect(()=>{
+      const source = Axios.CancelToken.source();
       const autoLogin = async ()=>{
          let response;
          try{
-            response = await axios({url : "/user/refresh_token", method : "get"}) 
+            response = await axios({url : "/user/refresh_token", method : "get", cancelToken : source.token}) 
             if(response.data.accesstoken) login(response.data.accesstoken);
          }catch(err){
          }
       }
       if(!accesstoken) autoLogin();
+
+      return ()=> source.cancel()
    },[login, accesstoken]);
 
 

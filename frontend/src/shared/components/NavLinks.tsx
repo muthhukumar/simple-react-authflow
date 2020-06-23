@@ -1,5 +1,6 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useRef, useContext, useEffect } from "react";
 import { NavLink } from "react-router-dom";
+import Axios from "axios";
 
 import { AuthContext } from "../hooks/AuthContext-hook";
 import "./NavLinks.css";
@@ -9,12 +10,14 @@ import LoadingSpinner from "../components/UIElements/LoadingSpinner";
 const Navigation: React.FC = () => {
    const isAuth = useContext(AuthContext);
    const [isLoading, setIsLoading] = useState(false);
+   const source = useRef<any>();
 
 
    const logout = async ()=>{
+      source.current = Axios.CancelToken.source();
       setIsLoading(true);
          try{
-            await axios({url : "/user/logout", method : "get"}) 
+            await axios({url : "/user/logout", method : "get", cancelToken : source.current.token}) 
             isAuth.logout();
             setIsLoading(false)
          }catch(err){
@@ -22,6 +25,9 @@ const Navigation: React.FC = () => {
          }
    }
 
+   useEffect(()=>{
+      return ()=> source.current.cancel();
+   },[])
    return (
       <div className="navigation-container">
          {isLoading && <LoadingSpinner/>}
@@ -48,7 +54,7 @@ const Navigation: React.FC = () => {
             )}
             {isAuth.accesstoken && (
                <li>
-                  <NavLink to="/home" onClick={logout}>
+                  <NavLink to="/logout" onClick={logout}>
                      LOGOUT
                   </NavLink>
                </li>

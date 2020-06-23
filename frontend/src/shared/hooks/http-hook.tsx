@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import Axios from "axios";
 
 import axios from "../../util/axios";
 
 export const useHttpClient = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const activeHttpRequest = useRef<AbortController[]>([]);
+  const source = useRef<any>();
+  const mounted = useRef(true);
 
   const httpClient =useCallback(async (
     data: any,
@@ -13,10 +15,11 @@ export const useHttpClient = () => {
     method: "post" | "get" | "patch" | "delete",
     token: string | null
   ) => {
+
+     source.current = Axios.CancelToken.source();
+
     let response;
-    setIsLoading(true);
-    const abortSignal = new AbortController();
-    activeHttpRequest.current.push(abortSignal);
+    if(mounted.current) setIsLoading(true);
     let headers;
     if (token) {
       headers = {
@@ -25,22 +28,27 @@ export const useHttpClient = () => {
     }
 
     try {
-      response = await axios({url,method, data, headers });
-      activeHttpRequest.current = activeHttpRequest.current.filter(
-        (ctrl) => ctrl !== abortSignal
-      );
-      setIsLoading(false);
-      return response;
+       response = await axios({url,method, data, headers , cancelToken : source.current.token});
+
+       if(mounted.current){ setIsLoading(false); return response; }
+
+       throw new Error("Something went wrong");
     } catch (err) {
-      setError("Something went wrong");
-      setIsLoading(false);
-      throw new Error("Something went wrong");
-    }
+       if(mounted.current){
+          console.log("mounted");
+          setError("Something went wrong");
+          setIsLoading(false);
+        }
+          throw new Error("Something went wrong");
+    }    
   },[]);
 
-  useEffect(() => {
-    return () => activeHttpRequest.current.forEach((ctrl) => ctrl.abort());
-  }, []);
+  useEffect(()=>{
+     return ()=>{
+        mounted.current= false;
+        if(source.current) source.current.cancel();
+     }
+  },[])
 
   const resetError = () => {
     setError(null);

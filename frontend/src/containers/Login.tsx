@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef, useEffect} from "react";
 import { useHistory } from "react-router-dom";
 
 import "./Auth.css";
@@ -29,6 +29,7 @@ const Login: React.FC = () => {
   ] = useErrorModal();
 
   const history = useHistory();
+  const mounted = useRef(true);
 
   const isAuth = useContext(AuthContext);
 
@@ -39,30 +40,20 @@ const Login: React.FC = () => {
 
   const onSubmitHandler = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    //const query = `
-    //mutation Login($email : String!, $password : String!){
-    //  login(credentials : {email : $email , password : $password}){
-    //    accesstoken
-    //  }
-    //}
-    //`;
     let serverResponse;
     try {
-     // serverResponse = await httpClient(
-     //   { query, variables: { email, password } },
-     //   "post",
-     //   null
-     // );
        serverResponse = await httpClient({
           email,
           password
        },"/user/login", "post",null );
     } catch (err) {
+       if(mounted.current){
       setIsErrorModalOpen(true);
       setMessage(err.message);
+       }
       return;
     }
+    if(!mounted.current) return;
 
     if (!serverResponse.data.errors && serverResponse.data) {
       setIsErrorModalOpen(true);
@@ -77,6 +68,11 @@ const Login: React.FC = () => {
       setMessage(serverResponse.data.errors[0].message);
     }
   };
+
+  useEffect(()=>{
+     return ()=> {mounted.current = false};
+  },[])
+
 
   return (
     <Card>
