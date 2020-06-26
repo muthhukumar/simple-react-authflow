@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState} from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import "./Profile.css";
 import Card from "../shared/components/UIElements/Card";
@@ -10,15 +10,14 @@ import BackDrop from "../shared/components/UIElements/BackDrop";
 
 const Profile: React.FC = () => {
   const isAuth = useContext(AuthContext);
-  const [userDetails, setUserDetails] = useState({ email : "", username: ""});
+  const [userDetails, setUserDetails] = useState({ email: "", username: "" });
 
   const [isLoading, setIsLoading] = useState(false);
-  const {accesstoken} = isAuth;
+  const { accesstoken } = isAuth;
 
   useEffect(() => {
-  const source = Axios.CancelToken.source();
+    const source = Axios.CancelToken.source();
     const fetchUserData = async () => {
-       console.log(userDetails);
       let response;
       const query = `
         query GetUserDetails{
@@ -34,33 +33,32 @@ const Profile: React.FC = () => {
       try {
         response = await axios({
           headers: {
-            Authorization: "Bearer " +accesstoken,
+            Authorization: "Bearer " + accesstoken,
           },
-          cancelToken : source.token,
-          url : "/graphql",
+          cancelToken: source.token,
+          url: "/graphql",
           method: "post",
           data: { query },
-          withCredentials : true,
+          withCredentials: true,
         });
-        console.log(response.data.data);
-        const {email , username} = response.data.data.userDetails;
-        setUserDetails({email, username});  
+        const { email, username } = response.data.data.userDetails;
+        setUserDetails({ email, username });
 
         setIsLoading(false);
       } catch (err) {
-         if(Axios.isCancel(err)){
-         }else{
-            throw err;
-         }
+        if (Axios.isCancel(err)) {
+        } else {
+          throw err;
+        }
         setIsLoading(false);
       }
     };
     if (!userDetails.username || !userDetails.email) fetchUserData();
-    return ()=> source.cancel();
+    return () => source.cancel();
   }, [userDetails, accesstoken]);
-  
+
   const onBackDropClickHanlder = () => {
-     setIsLoading(false);
+    setIsLoading(false);
   };
 
   return (

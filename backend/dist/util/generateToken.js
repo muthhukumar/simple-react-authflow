@@ -8,9 +8,9 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 //require("dotenv").config();
 const accesstoken_secret = process.env.ACCESS_TOKEN_SECRET;
 const refreshtoken_secret = process.env.REFRESH_TOKEN_SECRET;
-exports.genAccesstoken = (userId) => {
-    return jsonwebtoken_1.default.sign({ userId }, accesstoken_secret, { expiresIn: "6h" });
+exports.genAccesstoken = (payload) => {
+    return jsonwebtoken_1.default.sign(payload, accesstoken_secret, { expiresIn: "6h" });
 };
-exports.genRefreshtoken = (userId) => {
-    return jsonwebtoken_1.default.sign({ userId }, refreshtoken_secret, { expiresIn: "72h" });
+exports.genRefreshtoken = (payload) => {
+    return jsonwebtoken_1.default.sign(payload, refreshtoken_secret, { expiresIn: "72h" });
 };

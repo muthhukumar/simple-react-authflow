@@ -1,8 +1,6 @@
 import jwt from "jsonwebtoken";
 import { NextFunction } from "express";
 
-//require("dotenv").config();
-
 export default (req: any, _: any, next: NextFunction) => {
   const header = req.get("Authorization");
   if (!header) {
@@ -25,7 +23,6 @@ export default (req: any, _: any, next: NextFunction) => {
     return next();
   }
 
-
   if (!payload) {
     req.isAuth = false;
     return next();
@@ -33,5 +30,6 @@ export default (req: any, _: any, next: NextFunction) => {
 
   req.isAuth = true;
   req.userId = payload.userId;
+  req.isSocialAccount = payload.isSocialAccount;
   return next();
 };

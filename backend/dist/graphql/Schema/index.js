@@ -18,14 +18,12 @@ const schema = graphql_1.buildSchema(`
         username : String!
         email : String!
         hashedPassword : String
-        isVerified : Boolean!
     } 
 
     type AuthData{
         accesstoken : String
         email : String
         tokenExpiration : Int
-        isVerified : Boolean!
     }
 
     type Query{

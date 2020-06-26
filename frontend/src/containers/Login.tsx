@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useEffect} from "react";
+import React, { useContext, useRef, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 
 import "./Auth.css";
@@ -10,17 +10,12 @@ import ErrorModal from "../shared/components/UIElements/ErrorModal";
 import { useErrorModal } from "../shared/hooks/ErrorModal-hook";
 import { useInput } from "../shared/hooks/Input-hook";
 import { AuthContext } from "../shared/hooks/AuthContext-hook";
+import SocialLogin from "../components/SocialButtons";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useInput();
   const [password, setPassword] = useInput();
-  const [
-    ,
-    resetError,
-    isLoading,
-    resetLoading,
-    httpClient,
-  ] = useHttpClient();
+  const [, resetError, isLoading, resetLoading, httpClient] = useHttpClient();
   const [
     message,
     setMessage,
@@ -42,18 +37,23 @@ const Login: React.FC = () => {
     event.preventDefault();
     let serverResponse;
     try {
-       serverResponse = await httpClient({
+      serverResponse = await httpClient(
+        {
           email,
-          password
-       },"/user/login", "post",null );
+          password,
+        },
+        "/user/login",
+        "post",
+        null
+      );
     } catch (err) {
-       if(mounted.current){
-      setIsErrorModalOpen(true);
-      setMessage(err.message);
-       }
+      if (mounted.current) {
+        setIsErrorModalOpen(true);
+        setMessage(err.message);
+      }
       return;
     }
-    if(!mounted.current) return;
+    if (!mounted.current) return;
 
     if (!serverResponse.data.errors && serverResponse.data) {
       setIsErrorModalOpen(true);
@@ -62,17 +62,17 @@ const Login: React.FC = () => {
       history.push("/login");
       return;
     }
-
     if (serverResponse.data.errors) {
       setIsErrorModalOpen(true);
       setMessage(serverResponse.data.errors[0].message);
     }
   };
 
-  useEffect(()=>{
-     return ()=> {mounted.current = false};
-  },[])
-
+  useEffect(() => {
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   return (
     <Card>
@@ -110,6 +110,8 @@ const Login: React.FC = () => {
             login
           </button>
         </form>
+        <span className="cross-line" />
+        <SocialLogin type="login" />
       </div>
     </Card>
   );

@@ -16,6 +16,7 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const HttpError_1 = __importDefault(require("../../models/HttpError"));
 const generateToken_1 = require("../../util/generateToken");
 const User_schema_1 = __importDefault(require("../../models/User-schema"));
+const SocialUser_schema_1 = __importDefault(require("../../models/SocialUser-schema"));
 const signup = (args) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, email, password } = args.credentials;
     if (!username || !email || !password) {
@@ -54,7 +55,6 @@ const signup = (args) => __awaiter(void 0, void 0, void 0, function* () {
         username: createdUser.username,
         email: createdUser.email,
         hashedPassword: null,
-        isVerified: createdUser.isVerified,
     };
 });
 const login = (args) => __awaiter(void 0, void 0, void 0, function* () {
@@ -85,19 +85,28 @@ const login = (args) => __awaiter(void 0, void 0, void 0, function* () {
         accesstoken,
         email: user.email,
         tokenExpiration: 1,
-        isVerified: user.isVerified,
     };
 });
-const userDetails = (args, req) => __awaiter(void 0, void 0, void 0, function* () {
+const userDetails = (_, req) => __awaiter(void 0, void 0, void 0, function* () {
     if (!req.isAuth) {
         throw new HttpError_1.default("Unauthorized", 401);
     }
     let user;
-    try {
-        user = yield User_schema_1.default.findById(req.userId);
+    if (req.isSocialAccount) {
+        try {
+            user = yield SocialUser_schema_1.default.findById(req.userId);
+        }
+        catch (err) {
+            throw new HttpError_1.default("Something went wrong", 500);
+        }
     }
-    catch (err) {
-        throw new HttpError_1.default("Something went wrong", 500);
+    else {
+        try {
+            user = yield User_schema_1.default.findById(req.userId);
+        }
+        catch (err) {
+            throw new HttpError_1.default("Something went wrong", 500);
+        }
     }
     if (!user)
         throw new HttpError_1.default("User does not exist", 404);
@@ -105,8 +114,7 @@ const userDetails = (args, req) => __awaiter(void 0, void 0, void 0, function* (
         email: user.email,
         username: user.username,
         _id: user._id,
-        Hashedpassword: null,
-        isVerified: user.isVerified,
+        hashedpassword: null,
     };
 });
 exports.default = {

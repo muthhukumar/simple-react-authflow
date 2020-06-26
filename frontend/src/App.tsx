@@ -1,11 +1,10 @@
-import React, {Suspense, useEffect} from "react";
+import React, { Suspense, useEffect } from "react";
 import {
-   BrowserRouter as Router,
-   Switch,
-   Route,
-   Redirect
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
 } from "react-router-dom";
-
 
 import "./App.css";
 import Navigation from "./containers/Navigation";
@@ -20,63 +19,62 @@ const Login = React.lazy(() => import("./containers/Login"));
 const SignUp = React.lazy(() => import("./containers/SignUp"));
 const Profile = React.lazy(() => import("./containers/Profile"));
 function App() {
-   const [
-      accesstoken,
-      login,
-      logout,
-      error,
-      setErrorMessage
-   ] = useAuthContext();
+  const [accesstoken, login, logout, error, setErrorMessage] = useAuthContext();
 
-   useEffect(()=>{
-      const source = Axios.CancelToken.source();
-      const autoLogin = async ()=>{
-         let response;
-         try{
-            response = await axios({url : "/user/refresh_token", method : "get", cancelToken : source.token}) 
-            if(response.data.accesstoken) login(response.data.accesstoken);
-         }catch(err){
-         }
+  useEffect(() => {
+    const source = Axios.CancelToken.source();
+    const autoLogin = async () => {
+      let response;
+      try {
+        response = await axios({
+          url: "/user/refresh_token",
+          method: "get",
+          cancelToken: source.token,
+        });
+        if (response.data.accesstoken) login(response.data.accesstoken);
+      } catch (err) {
+        console.log(err);
       }
-      if(!accesstoken) autoLogin();
+    };
+    if (!accesstoken) autoLogin();
 
-      return ()=> source.cancel()
-   },[login, accesstoken]);
+    return () => source.cancel();
+  }, [login, accesstoken]);
 
+  let route;
+  if (accesstoken) {
+    route = (
+      <Switch>
+        <Route path="/home" component={Home} exact />
+        <Route path="/profile" component={Profile} exact />
+        <Redirect to="/home" />
+      </Switch>
+    );
+  } else {
+    route = (
+      <Switch>
+        <Route path="/home" component={Home} exact />
+        <Route path="/signup" component={SignUp} exact />
+        <Route path="/login" component={Login} exact />
+        <Redirect to="/home" />
+      </Switch>
+    );
+  }
 
-
-   let route;
-   if (accesstoken) {
-      route = (
-         <Switch>
-            <Route path="/home" component={Home} exact />
-            <Route path="/profile" component={Profile} exact />
-            <Redirect to="/home" />
-         </Switch>
-      );
-   } else {
-      route = (
-         <Switch>
-            <Route path="/home" component={Home} exact />
-            <Route path="/signup" component={SignUp} exact />
-            <Route path="/login" component={Login} exact />
-            <Redirect to="/home" />
-         </Switch>
-      );
-   }
-
-   return (
-      <AuthContext.Provider
-         value={{ accesstoken, login, logout, error, setErrorMessage }}
-      >
-         <Layout>
-            <Router>
-               <Navigation />
-               <main><Suspense fallback={<LoadingSpinner/>}>{route}</Suspense></main>
-            </Router>
-         </Layout>
-      </AuthContext.Provider>
-   );
+  return (
+    <AuthContext.Provider
+      value={{ accesstoken, login, logout, error, setErrorMessage }}
+    >
+      <Layout>
+        <Router>
+          <Navigation />
+          <main>
+            <Suspense fallback={<LoadingSpinner />}>{route}</Suspense>
+          </main>
+        </Router>
+      </Layout>
+    </AuthContext.Provider>
+  );
 }
 
 export default App;

@@ -9,46 +9,56 @@ export const useHttpClient = () => {
   const source = useRef<any>();
   const mounted = useRef(true);
 
-  const httpClient =useCallback(async (
-    data: any,
-    url : string,
-    method: "post" | "get" | "patch" | "delete",
-    token: string | null
-  ) => {
+  const httpClient = useCallback(
+    async (
+      data: any,
+      url: string,
+      method: "post" | "get" | "patch" | "delete",
+      token: string | null
+    ) => {
+      source.current = Axios.CancelToken.source();
 
-     source.current = Axios.CancelToken.source();
+      let response;
+      if (mounted.current) setIsLoading(true);
+      let headers;
+      if (token) {
+        headers = {
+          Authorization: "Bearer " + token,
+        };
+      }
 
-    let response;
-    if(mounted.current) setIsLoading(true);
-    let headers;
-    if (token) {
-      headers = {
-        Authorization: "Bearer " + token,
-      };
-    }
+      try {
+        response = await axios({
+          url,
+          method,
+          data,
+          headers,
+          cancelToken: source.current.token,
+        });
 
-    try {
-       response = await axios({url,method, data, headers , cancelToken : source.current.token});
+        if (mounted.current) {
+          setIsLoading(false);
+          return response;
+        }
 
-       if(mounted.current){ setIsLoading(false); return response; }
-
-       throw new Error("Something went wrong");
-    } catch (err) {
-       if(mounted.current){
-          console.log("mounted");
-          setError("Something went wrong");
+        throw new Error("Something went wrong");
+      } catch (err) {
+        if (mounted.current) {
+          setError(err.response.data.message);
           setIsLoading(false);
         }
-          throw new Error("Something went wrong");
-    }    
-  },[]);
+        throw new Error(err.response.data.message);
+      }
+    },
+    []
+  );
 
-  useEffect(()=>{
-     return ()=>{
-        mounted.current= false;
-        if(source.current) source.current.cancel();
-     }
-  },[])
+  useEffect(() => {
+    return () => {
+      mounted.current = false;
+      if (source.current) source.current.cancel();
+    };
+  }, []);
 
   const resetError = () => {
     setError(null);
