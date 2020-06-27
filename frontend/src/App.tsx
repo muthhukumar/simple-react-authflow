@@ -11,9 +11,9 @@ import Navigation from "./containers/Navigation";
 import Home from "./containers/Home";
 import Layout from "./containers/Layout";
 import { useAuthContext, AuthContext } from "./shared/hooks/AuthContext-hook";
-import LoadingSpinner from "./shared/components/UIElements/LoadingSpinner";
 import axios from "./util/axios";
 import Axios from "axios";
+import FallBack from "./containers/FallBack";
 
 const Login = React.lazy(() => import("./containers/Login"));
 const SignUp = React.lazy(() => import("./containers/SignUp"));
@@ -32,9 +32,7 @@ function App() {
           cancelToken: source.token,
         });
         if (response.data.accesstoken) login(response.data.accesstoken);
-      } catch (err) {
-        console.log(err);
-      }
+      } catch (err) {}
     };
     if (!accesstoken) autoLogin();
 
@@ -69,7 +67,7 @@ function App() {
         <Router>
           <Navigation />
           <main>
-            <Suspense fallback={<LoadingSpinner />}>{route}</Suspense>
+            <Suspense fallback={<FallBack />}>{route}</Suspense>
           </main>
         </Router>
       </Layout>

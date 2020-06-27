@@ -69,6 +69,7 @@ const SocialButton: React.FC<PropsType> = (props) => {
   };
 
   const facebookLogin = async (res: any) => {
+    console.log(res);
     if (res.error) {
       setIsErrorModalOpen(true);
       setMessage(res.error);

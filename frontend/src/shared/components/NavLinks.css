@@ -31,6 +31,8 @@
   padding: 1.1rem 2rem;
   text-decoration: none;
   color: black;
+  outline: none;
+  border: none;
 }
 
 .navigation-container a.active {
@@ -38,16 +40,8 @@
 }
 
 .navigation-container a:hover {
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.6);
 }
-/*
-@media (width <=768px){
-   .navigation-container ul{
-      display : none;
-   }
-} 
-
-*/
 @media (max-width: 768px) {
   .navigation-container {
     width: 100%;

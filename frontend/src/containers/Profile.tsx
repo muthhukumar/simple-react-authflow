@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useRef, useContext, useEffect, useState } from "react";
 
 import "./Profile.css";
 import Card from "../shared/components/UIElements/Card";
@@ -10,7 +10,8 @@ import BackDrop from "../shared/components/UIElements/BackDrop";
 
 const Profile: React.FC = () => {
   const isAuth = useContext(AuthContext);
-  const [userDetails, setUserDetails] = useState({ email: "", username: "" });
+  const email = useRef<string>("");
+  const username = useRef<string>("");
 
   const [isLoading, setIsLoading] = useState(false);
   const { accesstoken } = isAuth;
@@ -41,9 +42,12 @@ const Profile: React.FC = () => {
           data: { query },
           withCredentials: true,
         });
-        const { email, username } = response.data.data.userDetails;
-        setUserDetails({ email, username });
-
+        const {
+          email: userEmail,
+          username: userUsername,
+        } = response.data.data.userDetails;
+        email.current = userEmail;
+        username.current = userUsername;
         setIsLoading(false);
       } catch (err) {
         if (Axios.isCancel(err)) {
@@ -53,9 +57,10 @@ const Profile: React.FC = () => {
         setIsLoading(false);
       }
     };
-    if (!userDetails.username || !userDetails.email) fetchUserData();
+    if (!username.current || !email.current) fetchUserData();
+
     return () => source.cancel();
-  }, [userDetails, accesstoken]);
+  }, [accesstoken]);
 
   const onBackDropClickHanlder = () => {
     setIsLoading(false);
@@ -67,8 +72,12 @@ const Profile: React.FC = () => {
       {isLoading && <BackDrop onClick={onBackDropClickHanlder} />}
       <div className="profile-wrapper">
         <div className="profile-title">Profile</div>
-        <div className="profile-content">Name : {userDetails.username}</div>
-        <div className="profile-content">Email : {userDetails.email}</div>
+        <div className="profile-content">
+          <div>Name </div> <div>{username.current}</div>
+        </div>
+        <div className="profile-content">
+          <div>Email </div> <div>{email.current}</div>
+        </div>
       </div>
     </Card>
   );

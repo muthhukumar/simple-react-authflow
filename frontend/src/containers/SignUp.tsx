@@ -121,7 +121,7 @@ const SignUp: React.FC = () => {
           </button>
         </form>
         <span className="cross-line" />
-        <SocialLogin type="login" />
+        <SocialLogin type="Signup" />
       </div>
     </Card>
   );

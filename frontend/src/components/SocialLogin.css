@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   max-width: 16rem;
-  min-width: 9rem;
+  min-width: 13rem;
 }
 
 .or {
@@ -14,10 +14,11 @@
 .facebook-btn,
 .google-btn {
   width: 100%;
-  height: 2.2rem;
+  height: 2.6rem;
   font-size: 1rem;
   line-height: 0;
   text-transform: uppercase;
+  padding: 1.3rem 1rem;
   color: white;
   border: none;
   font-size: 0.8rem;
@@ -25,9 +26,10 @@
 }
 .facebook-btn {
   background: #3b5998;
+  width: 14rem;
 }
 .google-btn {
-  background: #4285f4;
+  background: #dd4b39;
 }
 .facebook-btn:hover,
 .google-btn:hover {

@@ -1,15 +1,19 @@
 .profile-wrapper {
-  width: 25rem;
-  height: 20rem;
+  width: 20rem;
+  height: 25rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 1px 1px 30px 1px rgba(0, 0, 0, 0.4);
+  background: linear-gradient(yellow, rgba(255, 255, 255, 0.7));
   border-radius: 6px;
+  position: relative;
 }
 
 .profile-title {
+  position: absolute;
+  top: 1rem;
   font-size: 1rem;
   font-weight: bold;
   margin: 1.1rem 0;
@@ -17,15 +21,20 @@
 }
 
 .profile-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
   font-size: 1rem;
-  background: rgba(255, 255, 255, 0.5);
   width: 70%;
   height: 2.5rem;
   border-radius: 6px;
   text-align: center;
   margin: 1.1rem 0;
-  vertical-align: middle;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+}
+.profile-content div:nth-child(1) {
+  font-weight: bold;
+}
+.profile-content div:nth-child(2) {
+  font-size: 0.9rem;
 }

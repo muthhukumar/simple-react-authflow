@@ -1,55 +1,52 @@
 .error-modal__container {
-    width: 17rem;
-    height: 5rem;
-    background: rgba(255, 255, 255, 0.75);
-    border-radius: 6px;
-    position: fixed;
-    z-index: 5;
-    top: 4rem;
-    right: 5rem;
-    animation: slideIn .5s linear;
-    display: flex;
-    align-items: center;
-    justify-self: center;
+  width: 14rem;
+  height: 4.5rem;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 6px;
+  position: fixed;
+  z-index: 5;
+  top: 4rem;
+  right: 5rem;
+  animation: slideIn 0.5s linear;
+  display: flex;
+  align-items: center;
+  justify-self: center;
 }
 
-
-
 .error-modal__message {
-    width: 70%;
-    display: flex;
-    height: 100%;
-    align-items: center;
-    justify-content: center;
-    border-right: 1px solid black;
-    font-size: 1.1rem;
-    padding : .5rem;
-    font-weight: 600;
+  width: 70%;
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid black;
+  font-size: 1rem;
+  padding: 0.4rem;
+  font-weight: 600;
 }
 
 .error-modal__button {
-    height: 100%;
-    width: 30%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
+  height: 100%;
+  width: 30%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .error-modal__button:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 @keyframes slideIn {
-    0% {
-        transform: translateX(10rem);
-    }
+  0% {
+    transform: translateX(10rem);
+  }
 
-    50% {
-        transform: translateX(5rem);
-    }
+  50% {
+    transform: translateX(5rem);
+  }
 
-    100% {
-        right: translateX(0);
-    }
+  100% {
+    right: translateX(0);
+  }
 }
